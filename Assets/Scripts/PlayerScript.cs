@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerScript : MonoBehaviour
 {
     public GameObject[] playerPrefabs;
+    public Transform CharactersFolder;
     int characterIndex;
     public GameObject spawnPoint;
     int[] otherPlayers;
@@ -14,7 +15,7 @@ public class PlayerScript : MonoBehaviour
     void Start()
     {
         characterIndex = PlayerPrefs.GetInt("SelectedCharacter", 0);
-        GameObject mainCharacter = Instantiate(playerPrefabs[characterIndex], spawnPoint.transform.position, Quaternion.identity);
+        GameObject mainCharacter = Instantiate(playerPrefabs[characterIndex], spawnPoint.transform.position, Quaternion.identity, CharactersFolder);
         mainCharacter.GetComponent<NameScript>().setPlayerName(PlayerPrefs.GetString("PlayerName"));
 
         otherPlayers = new int[PlayerPrefs.GetInt("PlayerCount")];
@@ -24,7 +25,7 @@ public class PlayerScript : MonoBehaviour
         {
             spawnPoint.transform.position += new Vector3(0.2f, 0, 0.08f);
             index = Random.Range(0, playerPrefabs.Length);
-            GameObject character = Instantiate(playerPrefabs[index], spawnPoint.transform.position, Quaternion.identity);
+            GameObject character = Instantiate(playerPrefabs[index], spawnPoint.transform.position, Quaternion.identity, CharactersFolder);
             character.GetComponent<NameScript>().setPlayerName(nameArray[Random.Range(0, nameArray.Length)]);
         }
     }

@@ -3754,6 +3754,7 @@ GameObject:
   - component: {fileID: 863616295}
   - component: {fileID: 863616296}
   - component: {fileID: 863616297}
+  - component: {fileID: 863616298}
   m_Layer: 5
   m_Name: Buttons
   m_TagString: Untagged
@@ -3810,6 +3811,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameObject2: {fileID: 42729401}
+--- !u!114 &863616298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863616294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d1bcbf7aa347bc478e67baa4492dd58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  power: 0.3
+  jigPos: 0
+  posJigAmount: {x: 0, y: 0, z: 0}
+  posFreq: 8
+  jigRot: 0
+  rotJigAmount: {x: 0, y: 0, z: 0}
+  rotFreq: 8
+  jigScale: 1
+  scaleJigAmount: {x: 0.1, y: -0.1, z: 0.1}
+  scaleFreq: 8
 --- !u!1 &866671636
 GameObject:
   m_ObjectHideFlags: 0
@@ -7715,7 +7738,7 @@ MonoBehaviour:
   - {fileID: 786539358}
   - {fileID: 594671268}
   inputField: {fileID: 372664011}
-  playerCount: 4
+  playerCount: 3
   sceneChangeScript: {fileID: 2052692160}
 --- !u!114 &2052692160
 MonoBehaviour:

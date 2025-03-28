@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 7782755583162462144}
   - component: {fileID: 5137453757432894856}
   - component: {fileID: 8547268696447432356}
+  - component: {fileID: 6613429556763835125}
   m_Layer: 0
   m_Name: EvilMan
   m_TagString: Untagged
@@ -291,3 +292,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6613429556763835125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6574270625143163868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc30f8a945722e542a1a5ed4ac23018e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waypoints: {fileID: 0}
+  moveSpeed: 1
+  distanceTresh: 0.1
