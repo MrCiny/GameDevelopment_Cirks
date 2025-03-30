@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 using static UnityEditor.Progress;
 
 public class PlayerMovementScript : MonoBehaviour
@@ -14,8 +15,10 @@ public class PlayerMovementScript : MonoBehaviour
     private Transform currentWaypoint = null;
     private Transform targetWaypoint;
 
+    private int currentIndex = 0;
+
+    private Vector3 velocity = Vector3.zero;
     private Dictionary<int, int> specialWaypoints = new Dictionary<int, int>();
-    private static Dictionary<Vector3, List<PlayerMovementScript>> tileOccupants = new Dictionary<Vector3, List<PlayerMovementScript>>();
 
     Animator animator;
 
@@ -23,6 +26,7 @@ public class PlayerMovementScript : MonoBehaviour
     {
         waypoints = FindAnyObjectByType<Waypoints>();
         animator = GetComponent<Animator>();
+        currentIndex = 0;
 
         currentWaypoint = waypoints.GetNextWaypoint(currentWaypoint);
         string[] specials = ReadLineFromFile("specialWaypoints");
@@ -33,19 +37,30 @@ public class PlayerMovementScript : MonoBehaviour
         }
     }
 
-    public void MovePlayer(int moves)
+    public void MovePlayer(int moves, bool attack = false)
     {
-        StartCoroutine(MoveToSpace(moves));
+        if (currentIndex + moves <= 100 && !attack) {
+            StartCoroutine(MoveForwardToSpace(moves));
+        }
+        else if (currentIndex + moves > 100 && !attack)
+        {
+            int back = - 100 + moves + currentIndex;
+            StartCoroutine(MoveBackwardToSpace(back-1));
+        }
+        else
+        {
+            StartCoroutine(MoveBackwardToSpace(moves));
+        }
     }
 
-    public IEnumerator MoveToSpace(int moves)
+    public IEnumerator MoveForwardToSpace(int moves)
     {
         animator.SetBool("isWalking", true);
         targetWaypoint = waypoints.GetWaypointFromMoves(moves, currentWaypoint);
+        currentIndex += moves;
         while (currentWaypoint.position != targetWaypoint.position)
         {
             currentWaypoint = waypoints.GetNextWaypoint(currentWaypoint);
-
             while (Vector3.Distance(transform.position, currentWaypoint.position) > 0.01f)
             {
                 transform.position = Vector3.MoveTowards(transform.position, currentWaypoint.position, moveSpeed * Time.deltaTime);
@@ -56,11 +71,12 @@ public class PlayerMovementScript : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
 
-        foreach (var item in specialWaypoints) 
+        foreach (var item in specialWaypoints)
         {
             if (transform.position == waypoints.GetWaypointAtIndex(item.Key).position)
             {
                 targetWaypoint = waypoints.GetWaypointAtIndex(item.Value);
+                currentIndex = item.Value;
                 while (currentWaypoint.position != targetWaypoint.position)
                 {
                     currentWaypoint = waypoints.GetWaypointAtIndex(item.Value);
@@ -76,14 +92,93 @@ public class PlayerMovementScript : MonoBehaviour
             }
         }
 
+        CheckForVictory();
+        CheckForAttack();
+
+        animator.SetBool("isWalking", false);
+    }
+
+    public IEnumerator MoveBackwardToSpace(int moves)
+    {
+        animator.SetBool("isWalking", true);
+        targetWaypoint = waypoints.GetWaypointFromMoves(moves, currentWaypoint, false);
+        currentIndex -= moves;
+        while (currentWaypoint.position != targetWaypoint.position)
+        {
+            currentWaypoint = waypoints.GetPreviousWaypoint(currentWaypoint);
+            while (Vector3.Distance(transform.position, currentWaypoint.position) > 0.01f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, currentWaypoint.position, moveSpeed * Time.deltaTime);
+                yield return null;
+            }
+
+            transform.position = currentWaypoint.position;
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        foreach (var item in specialWaypoints)
+        {
+            if (transform.position == waypoints.GetWaypointAtIndex(item.Key).position)
+            {
+                targetWaypoint = waypoints.GetWaypointAtIndex(item.Value);
+                while (currentWaypoint.position != targetWaypoint.position)
+                {
+                    currentWaypoint = waypoints.GetWaypointAtIndex(item.Value);
+                    currentIndex = item.Value;
+                    while (Vector3.Distance(transform.position, currentWaypoint.position) > 0.01f)
+                    {
+                        transform.position = Vector3.MoveTowards(transform.position, currentWaypoint.position, moveSpeed * Time.deltaTime);
+                        yield return null;
+                    }
+
+                    transform.position = currentWaypoint.position;
+                    yield return new WaitForSeconds(0.2f);
+                }
+            }
+        }
+        CheckForVictory();
+        CheckForAttack();
+
+        animator.SetBool("isWalking", false);
+    }
+
+    private void CheckForVictory() 
+    {
         if (transform.position == waypoints.GetWaypointAtIndex(100).position)
         {
             Debug.Log("You have won!");
             // Turpinat kodu ðeit...
         }
-
-        animator.SetBool("isWalking", false);
     }
+
+    private void CheckForAttack()
+    {
+        PlayerMovementScript[] players = FindObjectsOfType<PlayerMovementScript>();
+
+        foreach (var otherPlayer in players)
+        {
+            if (otherPlayer != this && otherPlayer.currentIndex == this.currentIndex)
+            {
+                StartCoroutine(HandleAttack(otherPlayer));
+            }
+        }
+    }
+
+    private IEnumerator HandleAttack(PlayerMovementScript opponent)
+    {
+        Debug.Log($"Attack: {gameObject.name} vs {opponent.gameObject.name}");
+
+        // Decide winner (random or based on stats)
+        bool thisPlayerWins = Random.value > 0.5f;
+
+        PlayerMovementScript loser = thisPlayerWins ? opponent : this;
+        Debug.Log($"{loser.gameObject.name} lost the battle!");
+
+        yield return new WaitForSeconds(1f); // Small delay before moving loser back
+
+        loser.MovePlayer(3, true); // Move loser back 3 spaces
+    }
+
 
     private string[] ReadLineFromFile(string fileName)
     {

@@ -9,6 +9,10 @@ Unity 2.5D Circus game project, demonstrates how to use UI elements, animate the
 - [x] Create character selection screen
 - [x] Learn about player prefs and saving in json
 - [x] Write script for dice rolling
-- [ ] Implement board logic (spaces)
-- [ ] Add combat logic
-- [ ] Add victory space
+- [x] Implement snakes and ladders board logic (spaces)
+- [x] Add combat logic
+- [-] Add victory space
+- [ ] Add point system
+- [x] Add settings system
+- [ ] Add pause menu
+- [ ] Add camera zoom

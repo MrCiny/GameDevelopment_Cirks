@@ -39,23 +39,26 @@ public class Waypoints : MonoBehaviour
         }
     }
 
-    public Transform GetWaypointFromMoves(int moves, Transform currentWaypoint)
+    public Transform GetWaypointFromMoves(int moves, Transform currentWaypoint, bool isForward = true)
     {
         if (currentWaypoint == null)
         {
             return transform.GetChild(0);
         }
 
-        int left_spaces = 200 - moves - currentWaypoint.GetSiblingIndex();
-
-        if (currentWaypoint.GetSiblingIndex() < transform.childCount - 1 - moves)
-        {;
+        if (isForward)
+        {
             return transform.GetChild(currentWaypoint.GetSiblingIndex() + moves);
         }
         else
         {
-            Debug.Log(left_spaces);
-            return transform.GetChild(left_spaces);
+            int ind = 0;
+            if (currentWaypoint.GetSiblingIndex() - moves < 0)
+                ind = 0;
+            else
+                ind = currentWaypoint.GetSiblingIndex() - moves;
+
+            return transform.GetChild(ind);
         }
     }
 
@@ -71,6 +74,13 @@ public class Waypoints : MonoBehaviour
             return transform.GetChild(0);
         }
 
-        return null;
+        if (currentWaypoint.GetSiblingIndex() > 0)
+        {
+            return transform.GetChild(currentWaypoint.GetSiblingIndex() - 1);
+        }
+        else
+        {
+            return transform.GetChild(currentWaypoint.GetSiblingIndex());
+        }
     }
 }
