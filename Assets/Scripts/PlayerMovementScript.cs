@@ -17,8 +17,10 @@ public class PlayerMovementScript : MonoBehaviour
 
     private int currentIndex = 0;
 
-    private Vector3 velocity = Vector3.zero;
+    private CameraScript mainCamera;
     private Dictionary<int, int> specialWaypoints = new Dictionary<int, int>();
+    private Dictionary<int, List<PlayerMovementScript>> tileOccupants = new Dictionary<int, List<PlayerMovementScript>>();
+
 
     Animator animator;
 
@@ -26,6 +28,7 @@ public class PlayerMovementScript : MonoBehaviour
     {
         waypoints = FindAnyObjectByType<Waypoints>();
         animator = GetComponent<Animator>();
+        mainCamera = FindAnyObjectByType<CameraScript>();
         currentIndex = 0;
 
         currentWaypoint = waypoints.GetNextWaypoint(currentWaypoint);
@@ -44,13 +47,17 @@ public class PlayerMovementScript : MonoBehaviour
         }
         else if (currentIndex + moves > 100 && !attack)
         {
-            int back = - 100 + moves + currentIndex;
-            StartCoroutine(MoveBackwardToSpace(back-1));
+            int targetIndex = 200 - currentIndex - moves;
+            if (targetIndex > currentIndex)
+                StartCoroutine(MoveForwardToSpace(targetIndex - currentIndex));
+            else
+                StartCoroutine(MoveBackwardToSpace(currentIndex - targetIndex));
         }
         else
         {
             StartCoroutine(MoveBackwardToSpace(moves));
         }
+
     }
 
     public IEnumerator MoveForwardToSpace(int moves)
@@ -64,6 +71,7 @@ public class PlayerMovementScript : MonoBehaviour
             while (Vector3.Distance(transform.position, currentWaypoint.position) > 0.01f)
             {
                 transform.position = Vector3.MoveTowards(transform.position, currentWaypoint.position, moveSpeed * Time.deltaTime);
+                mainCamera.UpdateCamera(transform);
                 yield return null;
             }
 
@@ -83,6 +91,7 @@ public class PlayerMovementScript : MonoBehaviour
                     while (Vector3.Distance(transform.position, currentWaypoint.position) > 0.01f)
                     {
                         transform.position = Vector3.MoveTowards(transform.position, currentWaypoint.position, moveSpeed * Time.deltaTime);
+                        mainCamera.UpdateCamera(transform);
                         yield return null;
                     }
 
@@ -92,6 +101,7 @@ public class PlayerMovementScript : MonoBehaviour
             }
         }
 
+        mainCamera.ResetCamera();
         CheckForVictory();
         CheckForAttack();
 
@@ -102,7 +112,11 @@ public class PlayerMovementScript : MonoBehaviour
     {
         animator.SetBool("isWalking", true);
         targetWaypoint = waypoints.GetWaypointFromMoves(moves, currentWaypoint, false);
-        currentIndex -= moves;
+        if (currentIndex - moves < 0)
+            currentIndex = 0;
+        else
+            currentIndex -= moves;
+
         while (currentWaypoint.position != targetWaypoint.position)
         {
             currentWaypoint = waypoints.GetPreviousWaypoint(currentWaypoint);
@@ -113,6 +127,7 @@ public class PlayerMovementScript : MonoBehaviour
             }
 
             transform.position = currentWaypoint.position;
+            mainCamera.UpdateCamera(transform);
             yield return new WaitForSeconds(0.2f);
         }
 
@@ -128,14 +143,18 @@ public class PlayerMovementScript : MonoBehaviour
                     while (Vector3.Distance(transform.position, currentWaypoint.position) > 0.01f)
                     {
                         transform.position = Vector3.MoveTowards(transform.position, currentWaypoint.position, moveSpeed * Time.deltaTime);
+                        mainCamera.UpdateCamera(transform);
                         yield return null;
                     }
 
                     transform.position = currentWaypoint.position;
+                    mainCamera.UpdateCamera(transform);
                     yield return new WaitForSeconds(0.2f);
                 }
             }
         }
+
+        mainCamera.ResetCamera();
         CheckForVictory();
         CheckForAttack();
 
@@ -166,17 +185,31 @@ public class PlayerMovementScript : MonoBehaviour
 
     private IEnumerator HandleAttack(PlayerMovementScript opponent)
     {
+        Vector3 curVel = Vector3.zero;
+        Vector3 opTargetPos = opponent.transform.position + new Vector3(0.2f, 0, 0);
+        Vector3 targetPos = transform.position - new Vector3(0.2f, 0, 0);
+        opponent.transform.position = opTargetPos;
+
+        while (Vector3.Distance(transform.position, targetPos) > 0.01f)
+        {
+            transform.position = Vector3.SmoothDamp(transform.position,targetPos, ref curVel, moveSpeed * Time.deltaTime);
+            opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, opTargetPos, moveSpeed * Time.deltaTime);
+            yield return null;
+        }
+        yield return new WaitForSeconds(0.2f);
+
         Debug.Log($"Attack: {gameObject.name} vs {opponent.gameObject.name}");
 
-        // Decide winner (random or based on stats)
         bool thisPlayerWins = Random.value > 0.5f;
 
         PlayerMovementScript loser = thisPlayerWins ? opponent : this;
+
+        // Japieliek animacija
         Debug.Log($"{loser.gameObject.name} lost the battle!");
 
-        yield return new WaitForSeconds(1f); // Small delay before moving loser back
+        yield return new WaitForSeconds(3f);
 
-        loser.MovePlayer(3, true); // Move loser back 3 spaces
+        loser.MovePlayer(3, true);
     }
 
 
