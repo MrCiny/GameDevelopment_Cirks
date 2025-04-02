@@ -23,8 +23,8 @@ public class DiceRollScript : MonoBehaviour
         if (body !=  null)
         {
             bool isPaused = PlayerPrefs.GetInt("isPaused") == 1 ? true : false;
-            bool playerTurn = PlayerPrefs.GetInt("playerTurn") == 1 ? true : false;
-            if (Input.GetMouseButton(0) && isLanded && !isPaused || Input.GetMouseButton(0) && !firstThrow && !isPaused)
+            bool isVictory = PlayerPrefs.GetInt("isVictory") == 1 ? true : false;
+            if (Input.GetMouseButton(0) && isLanded && !isPaused && !isVictory || Input.GetMouseButton(0) && !firstThrow && !isPaused && !isVictory)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;

@@ -20,7 +20,7 @@ public class PauseMenuScript : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))
+        if (Input.GetKeyUp(KeyCode.Escape) && PlayerPrefs.GetInt("isVictory") == 0)
         {
             isPaused = !isPaused;
             int boolInt = isPaused ? 1 : 0;

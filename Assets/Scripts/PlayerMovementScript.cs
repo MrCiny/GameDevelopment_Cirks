@@ -12,6 +12,10 @@ public class PlayerMovementScript : MonoBehaviour
 
     [SerializeField] private float moveSpeed = 0.5f;
 
+    [SerializeField] private LeaderboardScript leaderboard;
+
+    private VictoryScript victoryScript;
+
     private Transform currentWaypoint = null;
     private Transform targetWaypoint;
 
@@ -25,6 +29,7 @@ public class PlayerMovementScript : MonoBehaviour
 
     void Start()
     {
+        victoryScript = FindAnyObjectByType<VictoryScript>();
         waypoints = FindAnyObjectByType<Waypoints>();
         animator = GetComponent<Animator>();
         mainCamera = FindAnyObjectByType<CameraScript>();
@@ -162,10 +167,11 @@ public class PlayerMovementScript : MonoBehaviour
 
     private void CheckForVictory() 
     {
-        if (transform.position == waypoints.GetWaypointAtIndex(100).position)
+        leaderboard = FindAnyObjectByType<LeaderboardScript>(FindObjectsInactive.Include);
+        if (transform.position == waypoints.GetWaypointAtIndex(14).position)
         {
-            Debug.Log("You have won!");
-            // Turpinat kodu ðeit...
+            leaderboard.UpdateLeaderboard(transform.GetComponent<NameScript>().getPlayerName());
+            victoryScript.Victory();
         }
     }
 
@@ -175,7 +181,7 @@ public class PlayerMovementScript : MonoBehaviour
 
         foreach (var otherPlayer in players)
         {
-            if (otherPlayer != this && otherPlayer.currentIndex == this.currentIndex)
+            if (otherPlayer != this && otherPlayer.currentIndex == this.currentIndex && currentIndex != 0)
             {
                 StartCoroutine(HandleAttack(otherPlayer));
             }
