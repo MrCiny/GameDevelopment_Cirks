@@ -14,6 +14,7 @@ public class DiceRollScript : MonoBehaviour
     void Awake()
     {
         Initialize(0);
+        PlayerPrefs.SetInt("playerTurn", 1);
     }
 
     // Update is called once per frame
@@ -21,7 +22,9 @@ public class DiceRollScript : MonoBehaviour
     {
         if (body !=  null)
         {
-            if (Input.GetMouseButton(0) && isLanded || Input.GetMouseButton(0) && !firstThrow)
+            bool isPaused = PlayerPrefs.GetInt("isPaused") == 1 ? true : false;
+            bool playerTurn = PlayerPrefs.GetInt("playerTurn") == 1 ? true : false;
+            if (Input.GetMouseButton(0) && isLanded && !isPaused || Input.GetMouseButton(0) && !firstThrow && !isPaused)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;

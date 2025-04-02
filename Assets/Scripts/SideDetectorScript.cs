@@ -12,7 +12,7 @@ public class SideDetectorScript : MonoBehaviour
     private int ind = 0;
     private bool hasMoved = false;
 
-    private float moveCooldown = 1f; // 1 second cooldown
+    private float moveCooldown = 1f;
     private float lastMoveTime = 0f;
     void Awake()
     {
@@ -20,7 +20,7 @@ public class SideDetectorScript : MonoBehaviour
         //playerMovementScript = playerPref.GetComponent<PlayerMovementScript>();
     }
 
-    private void OnTriggerStay(Collider other)
+    private IEnumerator OnTriggerStay(Collider other)
     {
         if (diceRollScript != null)
         {
@@ -38,12 +38,15 @@ public class SideDetectorScript : MonoBehaviour
                     hasMoved = true;
                     lastMoveTime = Time.time;
 
+                    yield return new WaitForSeconds(moveCooldown);
+
                     if (ind < players.Length - 1)
                     {
                         ind++;
                     }
                     else
                     {
+                        PlayerPrefs.SetInt("playerTurn", 1);
                         ind = 0;
                     }
                 }

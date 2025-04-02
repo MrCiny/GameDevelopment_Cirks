@@ -9421,9 +9421,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fileName: saveFile.json
+  script: {fileID: 42729404}
   data:
-    character: 0
-    characterName: 
+    volume: 0
+    resWidth: 0
+    resHeight: 0
+    isFullscreen: 0
 --- !u!1 &2111461326
 GameObject:
   m_ObjectHideFlags: 0

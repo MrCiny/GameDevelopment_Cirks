@@ -19,7 +19,6 @@ public class PlayerMovementScript : MonoBehaviour
 
     private CameraScript mainCamera;
     private Dictionary<int, int> specialWaypoints = new Dictionary<int, int>();
-    private Dictionary<int, List<PlayerMovementScript>> tileOccupants = new Dictionary<int, List<PlayerMovementScript>>();
 
 
     Animator animator;
@@ -189,6 +188,7 @@ public class PlayerMovementScript : MonoBehaviour
         Vector3 opTargetPos = opponent.transform.position + new Vector3(0.2f, 0, 0);
         Vector3 targetPos = transform.position - new Vector3(0.2f, 0, 0);
         opponent.transform.position = opTargetPos;
+        opponent.transform.localScale = new Vector3(-0.1f, 0.1f, 0.1f);
 
         while (Vector3.Distance(transform.position, targetPos) > 0.01f)
         {
@@ -198,17 +198,15 @@ public class PlayerMovementScript : MonoBehaviour
         }
         yield return new WaitForSeconds(0.2f);
 
-        Debug.Log($"Attack: {gameObject.name} vs {opponent.gameObject.name}");
-
         bool thisPlayerWins = Random.value > 0.5f;
 
         PlayerMovementScript loser = thisPlayerWins ? opponent : this;
+        PlayerMovementScript winner = thisPlayerWins ? this : opponent;
 
-        // Japieliek animacija
-        Debug.Log($"{loser.gameObject.name} lost the battle!");
-
-        yield return new WaitForSeconds(3f);
-
+        winner.animator.SetTrigger("attack");
+        loser.animator.SetTrigger("hurt");
+        yield return new WaitForSeconds(1.5f);
+        opponent.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         loser.MovePlayer(3, true);
     }
 

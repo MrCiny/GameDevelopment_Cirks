@@ -16,7 +16,6 @@ public class CameraScript : MonoBehaviour
     public void Awake()
     {
         cameraOffset = transform.position;
-        Debug.Log(cameraOffset);
     }
 
     private void LateUpdate()
