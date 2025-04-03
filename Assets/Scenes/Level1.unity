@@ -4363,7 +4363,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Top 5 Lifetime Wins
+  m_text: Top 5 highest points
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bd95f271ad1074e4987e51b6b2ed7b86, type: 2}
   m_sharedMaterial: {fileID: -961335486631241887, guid: bd95f271ad1074e4987e51b6b2ed7b86, type: 2}
@@ -13152,7 +13152,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Top 5 Lifetime Wins
+  m_text: Top 5 highest points
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bd95f271ad1074e4987e51b6b2ed7b86, type: 2}
   m_sharedMaterial: {fileID: -961335486631241887, guid: bd95f271ad1074e4987e51b6b2ed7b86, type: 2}

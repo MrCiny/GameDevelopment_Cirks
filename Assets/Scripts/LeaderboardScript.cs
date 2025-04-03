@@ -27,7 +27,8 @@ public class LeaderboardScript : MonoBehaviour
 
         if (player != null)
         {
-            player.points = totalPoints;
+            if (totalPoints > player.points)
+                player.points = totalPoints;
         }
         else
         {
@@ -51,11 +52,6 @@ public class LeaderboardScript : MonoBehaviour
 
         if (leaderboard.Count > maxEntries)
             leaderboard = leaderboard.Take(maxEntries).ToList();
-
-        foreach (PlayerData player in leaderboard)
-        {
-            Debug.Log($"Player {player.name}");
-        }
 
         using (StreamWriter writer = new StreamWriter(filePath, false))
         {
