@@ -46,7 +46,6 @@ public class SideDetectorScript : MonoBehaviour
                     }
                     else
                     {
-                        PlayerPrefs.SetInt("playerTurn", 1);
                         ind = 0;
                     }
                 }

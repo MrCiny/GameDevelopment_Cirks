@@ -1,10 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static UnityEditor.Progress;
 
 public class PlayerMovementScript : MonoBehaviour
 {
@@ -12,7 +8,9 @@ public class PlayerMovementScript : MonoBehaviour
 
     [SerializeField] private float moveSpeed = 0.5f;
 
-    [SerializeField] private LeaderboardScript leaderboard;
+    [SerializeField] private LeaderboardScript leaderboard; 
+
+    public int winningSpace = 100;
 
     private VictoryScript victoryScript;
 
@@ -24,11 +22,16 @@ public class PlayerMovementScript : MonoBehaviour
     private CameraScript mainCamera;
     private Dictionary<int, int> specialWaypoints = new Dictionary<int, int>();
 
+    private float startTime;
+    private float endTime;
+    private int totalMoves = 0;
+
 
     Animator animator;
 
     void Start()
     {
+        startTime = Time.time;
         victoryScript = FindAnyObjectByType<VictoryScript>();
         waypoints = FindAnyObjectByType<Waypoints>();
         animator = GetComponent<Animator>();
@@ -47,21 +50,22 @@ public class PlayerMovementScript : MonoBehaviour
     public void MovePlayer(int moves, bool attack = false)
     {
         if (currentIndex + moves <= 100 && !attack) {
+            totalMoves++;
             StartCoroutine(MoveForwardToSpace(moves));
         }
         else if (currentIndex + moves > 100 && !attack)
         {
+            totalMoves++;
             int targetIndex = 200 - currentIndex - moves;
             if (targetIndex > currentIndex)
                 StartCoroutine(MoveForwardToSpace(targetIndex - currentIndex));
             else
-                StartCoroutine(MoveBackwardToSpace(currentIndex - targetIndex));
+                 StartCoroutine(MoveBackwardToSpace(currentIndex - targetIndex));
         }
         else
         {
             StartCoroutine(MoveBackwardToSpace(moves));
         }
-
     }
 
     public IEnumerator MoveForwardToSpace(int moves)
@@ -168,9 +172,11 @@ public class PlayerMovementScript : MonoBehaviour
     private void CheckForVictory() 
     {
         leaderboard = FindAnyObjectByType<LeaderboardScript>(FindObjectsInactive.Include);
-        if (transform.position == waypoints.GetWaypointAtIndex(14).position)
+        if (transform.position == waypoints.GetWaypointAtIndex(winningSpace).position)
         {
-            leaderboard.UpdateLeaderboard(transform.GetComponent<NameScript>().getPlayerName());
+            endTime = Time.time;
+            float totalTime = endTime - startTime;
+            leaderboard.UpdateLeaderboard(transform.GetComponent<NameScript>().getPlayerName(), totalTime, totalMoves);
             victoryScript.Victory();
         }
     }

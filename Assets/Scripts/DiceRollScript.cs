@@ -14,7 +14,6 @@ public class DiceRollScript : MonoBehaviour
     void Awake()
     {
         Initialize(0);
-        PlayerPrefs.SetInt("playerTurn", 1);
     }
 
     // Update is called once per frame

@@ -1,8 +1,6 @@
 using System;
-using UnityEngine;
-using static UnityEditor.PlayerSettings;
-using UnityEngine.TextCore.Text;
 using System.IO;
+using UnityEngine;
 
 public class SaveLoadScript : MonoBehaviour
 {
@@ -30,7 +28,6 @@ public class SaveLoadScript : MonoBehaviour
 
         string json = JsonUtility.ToJson(data);
         File.WriteAllText(Application.persistentDataPath+ "/"+fileName, json);
-        Debug.Log("Game saved to: " + Application.persistentDataPath + "/" + fileName);
     }
     public void LoadGame()
     {
@@ -44,7 +41,6 @@ public class SaveLoadScript : MonoBehaviour
             PlayerPrefs.SetInt("resWidth", data.resWidth);
             PlayerPrefs.SetInt("resHeight", data.resHeight);
             script.Load();
-            Debug.Log("Game loaded from: " + Application.persistentDataPath + "/" + fileName);
         } 
         else
         {

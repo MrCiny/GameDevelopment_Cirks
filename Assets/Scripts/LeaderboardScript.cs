@@ -19,18 +19,19 @@ public class LeaderboardScript : MonoBehaviour
         LoadLeaderboard();
     }
 
-    public void UpdateLeaderboard(string playerName)
+    public void UpdateLeaderboard(string playerName, float totalTime, int totalMoves)
     {
         LoadLeaderboard();
         PlayerData player = leaderboard.FirstOrDefault(p => p.name == playerName);
+        int totalPoints = totalMoves * 10 - Mathf.RoundToInt(totalTime / 10);
 
         if (player != null)
         {
-            player.wins++;
+            player.points = totalPoints;
         }
         else
         {
-            leaderboard.Add(new PlayerData(playerName, 1));
+            leaderboard.Add(new PlayerData(playerName, totalPoints));
         }
 
         SortAndSave();
@@ -46,7 +47,7 @@ public class LeaderboardScript : MonoBehaviour
         if (!File.Exists(filePath))
             File.Create(filePath).Close();
 
-        leaderboard = leaderboard.OrderByDescending(p => p.wins).ToList();
+        leaderboard = leaderboard.OrderByDescending(p => p.points).ToList();
 
         if (leaderboard.Count > maxEntries)
             leaderboard = leaderboard.Take(maxEntries).ToList();
@@ -60,7 +61,7 @@ public class LeaderboardScript : MonoBehaviour
         {
             foreach (PlayerData p in leaderboard)
             {
-                writer.WriteLine($"{p.name}:{p.wins}");
+                writer.WriteLine($"{p.name}:{p.points}");
             }
         }
 
@@ -78,33 +79,23 @@ public class LeaderboardScript : MonoBehaviour
         Transform[] placeholders = leaderboardItems.GetComponentsInChildren<Transform>(true);
         leaderboard.Clear();
         string[] lines = File.ReadAllLines(filePath);
-        foreach (string line in lines)
-        {
-            Debug.Log(line);
-        }
         int j = 1;
         for (int i = 0; j < placeholders.Length && i < lines.Count(); i++) 
         {
             Transform placeholder = placeholders[j];
             string[] parts = lines[i].Split(':');
-            Debug.Log(placeholders.Length);
             if (parts.Length == 2 && int.TryParse(parts[1], out int wins))
             {
                 leaderboard.Add(new PlayerData(parts[0], wins));
             }
-            foreach (PlayerData p in leaderboard)
-            {
-                Debug.Log(p.name);
-            }   
             TextMeshProUGUI playerText = placeholder.Find("Player").GetComponent<TextMeshProUGUI>();
             TextMeshProUGUI winText = placeholder.Find("Wins").GetComponent<TextMeshProUGUI>();
-            Debug.Log(playerText.name);
             playerText.text = parts[0] != null ? parts[0] : "";
-            winText.text = parts[1] != null ? parts[1] : "";
+            winText.text = parts[1] != null ? parts[1] + "p" : "p";
             j += 5;
         }
 
-        leaderboard = leaderboard.OrderByDescending(p => p.wins).Take(maxEntries).ToList();
+        leaderboard = leaderboard.OrderByDescending(p => p.points).Take(maxEntries).ToList();
     }
 }
 
@@ -112,11 +103,11 @@ public class LeaderboardScript : MonoBehaviour
 public class PlayerData
 {
     public string name;
-    public int wins;
+    public int points;
 
-    public PlayerData(string name, int wins)
+    public PlayerData(string name, int points)
     {
         this.name = name;
-        this.wins = wins;
+        this.points = points;
     }
 }
